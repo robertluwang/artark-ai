@@ -1,0 +1,16 @@
+baseURL = 'https://github.com/robertluwang/artark-ai'
+languageCode = 'en-us'
+title = 'My Tech Blog'
+theme = 'papermod'
+
+[params]
+  env = "production"
+  title = "My Tech Blog"
+  description = "Minimal tech notes and code snippets"
+  author = "Me"
+  showReadingTime = true
+  showShareButtons = true
+  showPostNavLinks = true
+  
+[outputs]
+  home = [ "HTML", "RSS", "JSON"]
