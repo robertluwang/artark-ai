@@ -73,16 +73,22 @@ Save this as `publish.sh` in your Hugo site root:
 
 ```bash
 #!/bin/bash
-# publish.sh — Sync posts from Obsidian vault to Hugo repo, build, push
+# publish.sh — Sync posts between Obsidian vault and Hugo repo, build, push
 # Usage: ./publish.sh [commit message]
 
 VAULT="/mnt/c/Users/you/obsidian-vaults/my-blog/posts"
 HUGO_POSTS="$HOME/hugo-site/content/posts"
 
-# One-way sync: vault → repo
-rsync -av --delete --exclude='.obsidian' "$VAULT/" "$HUGO_POSTS/"
-
 cd "$HOME/hugo-site"
+
+# Pull latest (in case iPhone pushed new posts)
+git pull --rebase origin main
+
+# Sync REPO → VAULT (so Obsidian sees iPhone posts)
+rsync -av --delete --exclude='.obsidian' "$HUGO_POSTS/" "$VAULT/"
+
+# Sync VAULT → REPO (pick up desktop Obsidian edits)
+rsync -av --delete --exclude='.obsidian' "$VAULT/" "$HUGO_POSTS/"
 
 # Show changes
 git status --short
@@ -97,6 +103,10 @@ fi
 # Commit and push
 MSG="${1:-update blog posts}"
 git add -A
+if git diff --cached --quiet; then
+    echo "Nothing to publish."
+    exit 0
+fi
 git commit -m "$MSG"
 git push origin main
 
