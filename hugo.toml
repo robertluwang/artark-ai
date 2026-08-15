@@ -11,6 +11,7 @@ theme = 'papermod'
   showReadingTime = true
   showShareButtons = true
   showPostNavLinks = true
+  showTags = true
   
 [outputs]
   home = [ "HTML", "RSS", "JSON"]
