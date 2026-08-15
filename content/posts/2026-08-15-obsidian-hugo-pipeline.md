@@ -136,7 +136,7 @@ Manually typing front matter for every post is tedious. The **Templater** commun
 
 1. **Settings → Community plugins → Browse** → search **"Templater"** → Install → Enable
 2. Create a folder `_templates/` at the vault root (outside `posts/` — won't sync to GitHub)
-3. Create `_templates/hugo-post.md`:
+3. Create `_templates/hugo-post` (Obsidian auto-adds `.md`):
 
 ```
 +++
