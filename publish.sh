@@ -10,10 +10,11 @@ cd "$HOME/ai/lab/hugo/artark-ai"
 # Pull latest (in case iPhone pushed new posts)
 git pull --rebase origin main
 
-# Sync REPO → VAULT (so Obsidian sees iPhone posts)
-rsync -av --delete --exclude='.obsidian' "$HUGO_POSTS/" "$VAULT/"
+# Sync NEW files from repo → vault (iPhone posts you don't have locally)
+# --ignore-existing keeps vault edits intact
+rsync -av --ignore-existing "$HUGO_POSTS/" "$VAULT/"
 
-# Sync VAULT → REPO (pick up desktop Obsidian edits)
+# Sync VAULT → REPO (vault is the source of truth for desktop edits)
 rsync -av --delete --exclude='.obsidian' "$VAULT/" "$HUGO_POSTS/"
 
 # Show changes
