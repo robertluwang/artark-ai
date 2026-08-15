@@ -130,42 +130,45 @@ Just in case Obsidian ever creates config files near the repo:
 .obsidian/
 ```
 
-### Step 5: Set Up Templater Plugin for Hugo Front Matter
+### Step 5: Set Up Template for Hugo Front Matter
 
-Manually typing front matter for every post is tedious. The **Templater** community plugin auto-fills it.
+Manually typing front matter for every post is tedious. Obsidian's built-in **Templates** core plugin auto-fills it.
 
-1. **Settings → Community plugins → Browse** → search **"Templater"** → Install → Enable
+1. **Settings → Core plugins → Templates** → toggle On
 2. Create a folder `_templates/` at the vault root (outside `posts/` — won't sync to GitHub)
 3. Create `_templates/hugo-post` (Obsidian auto-adds `.md`):
 
 ```
 +++
-date = '<% tp.date.now("YYYY-MM-DDTHH:mm:ssZ") %>'
+date = '{{date:YYYY-MM-DDTHH:mm:ssZ}}'
 draft = false
-title = '<% tp.file.title %>'
+title = ''
 tags = []
 +++
 
 ```
 
-4. **Settings → Templater** → set **Template folder:** `_templates`
+4. **Settings → Templates** → set **Template folder location:** `_templates`
+5. **Date format:** `YYYY-MM-DDTHH:mm:ssZ`
 
-**Usage:** Create a new note in `posts/`, then click the Templater icon in the left sidebar. Front matter is inserted with today's date/time and the filename as title. Just start writing.
+**Usage:** Create a new note in `posts/`, tap the Templates icon in the ribbon (bottom-right on mobile, left sidebar on desktop) → select `hugo-post`. Date auto-fills. Type your title and start writing.
+
+Works identically on desktop and iPhone — no community plugins needed.
 
 ### Daily Workflow
 
-**Write** — Create a new note in `posts/` → click Templater icon → front matter auto-fills:
+**Write** — Create a new note in `posts/` → tap Templates icon → front matter auto-fills:
 
 ```
 +++
 date = '2026-08-15T17:00:03-04:00'
 draft = false
-title = '2026-08-15-my-topic'
+title = ''
 tags = []
 +++
 ```
 
-Edit the title, add tags, write your content.
+Fill in the title, add tags, write your content.
 
 **Preview** — In WSL, sync and preview before publishing:
 
