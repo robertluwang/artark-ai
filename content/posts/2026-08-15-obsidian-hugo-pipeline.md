@@ -130,20 +130,42 @@ Just in case Obsidian ever creates config files near the repo:
 .obsidian/
 ```
 
+### Step 5: Set Up Templater Plugin for Hugo Front Matter
+
+Manually typing front matter for every post is tedious. The **Templater** community plugin auto-fills it.
+
+1. **Settings → Community plugins → Browse** → search **"Templater"** → Install → Enable
+2. Create a folder `_templates/` at the vault root (outside `posts/` — won't sync to GitHub)
+3. Create `_templates/hugo-post.md`:
+
+```
++++
+date = '<% tp.date.now("YYYY-MM-DDTHH:mm:ssZ") %>'
+draft = false
+title = '<% tp.file.title %>'
+tags = []
++++
+
+```
+
+4. **Settings → Templater** → set **Template folder:** `_templates`
+
+**Usage:** Create a new note in `posts/`, then click the Templater icon in the left sidebar. Front matter is inserted with today's date/time and the filename as title. Just start writing.
+
 ### Daily Workflow
 
-**Write** — Open Obsidian, create a new note in `posts/`. Add Hugo front matter at the top:
+**Write** — Create a new note in `posts/` → click Templater icon → front matter auto-fills:
 
 ```
 +++
-date = '2026-08-15'
+date = '2026-08-15T17:00:03-04:00'
 draft = false
-title = 'My Post Title'
-tags = ['topic']
+title = '2026-08-15-my-topic'
+tags = []
 +++
-
-Your content here...
 ```
+
+Edit the title, add tags, write your content.
 
 **Preview** — In WSL, sync and preview before publishing:
 
