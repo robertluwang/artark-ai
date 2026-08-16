@@ -53,7 +53,7 @@ mkdir -p /mnt/c/Users/you/obsidian-vaults/my-blog/posts
 Copy any existing posts into it:
 
 ```bash
-cp ~/hugo-site/content/posts/*.md /mnt/c/Users/you/obsidian-vaults/my-blog/posts/
+cp -r ~/hugo-site/content/posts/* /mnt/c/Users/you/obsidian-vaults/my-blog/posts/
 ```
 
 ### Step 2: Open the Vault in Obsidian
@@ -72,8 +72,9 @@ Under **Settings → Files & Links**:
 - **New link format:** Relative path to file
 - **Default location for new notes:** `posts/`
 - **Use `[[Wikilinks]]`:** turn OFF
+- **Default location for new attachments:** Same folder as current file
 
-> **Tip:** By default Obsidian uses wiki-style `![[image.png]]` syntax for images. Turning off Wikilinks makes it output `![](image.png)` instead — standard Markdown that your sync script and Hugo both understand without extra processing.
+> **Tip:** Turning off Wikilinks makes Obsidian output `![](image.png)` instead of `![[image.png]]` — standard Markdown that Hugo understands. Setting attachments to "Same folder as current file" ensures images land inside the page bundle alongside `index.md`.
 
 ### Step 4: Create the Publish Script
 
@@ -138,45 +139,61 @@ Just in case Obsidian ever creates config files near the repo:
 .obsidian/
 ```
 
-### Step 5: Set Up Template for Hugo Front Matter
+### Step 5: Set Up Templater for New Posts
 
-Manually typing front matter for every post is tedious. Obsidian's built-in **Templates** core plugin auto-fills it.
+The **Templater** community plugin creates a complete page bundle (folder + `index.md` + front matter) in one action.
 
-1. **Settings → Core plugins → Templates** → toggle On
-2. Create a folder `_templates/` at the vault root (outside `posts/` — won't sync to GitHub)
-3. Create `_templates/hugo-post` (Obsidian auto-adds `.md`):
+1. **Settings → Community plugins** → Turn off Restricted Mode
+2. **Browse** → search **"Templater"** → Install → Enable
+3. **Settings → Templater** → set **Template folder location:** `_templates`
+
+The repo includes `_templates/new-post.md` which handles everything — prompts for title and tags, creates the folder, writes the front matter with cover image config, and opens the file for editing.
+
+You can also use `_templates/hugo-post.md` to insert front matter into an existing note.
+
+### Page Bundles and Images
+
+Posts use Hugo **page bundles** — each post is a folder:
 
 ```
-+++
-date = '{{date:YYYY-MM-DDTHH:mm:ssZ}}'
-draft = false
-title = ''
-tags = []
-+++
-
+content/posts/2026-08-16-my-post/
+├── index.md        ← your post
+├── banner.png      ← cover image (shown on listing + post header)
+└── diagram.png     ← inline image
 ```
 
-4. **Settings → Templates** → set **Template folder location:** `_templates`
-5. **Date format:** `YYYY-MM-DDTHH:mm:ssZ`
+- **Cover image:** the template pre-fills `[params.cover]` pointing to `banner.png`. Drop any image and name it `banner.png`.
+- **Inline images:** paste or drag an image while editing — Obsidian saves it in the same folder. Reference with `![](filename.png)`.
 
-**Usage:** Create a new note in `posts/`, tap the Templates icon in the ribbon (bottom-right on mobile, left sidebar on desktop) → select `hugo-post`. Date auto-fills. Type your title and start writing.
-
-Works identically on desktop and iPhone — no community plugins needed.
+This works on both desktop Obsidian and iPhone — same structure, same syntax.
 
 ### Daily Workflow
 
-**Write** — Create a new note in `posts/` → tap Templates icon → front matter auto-fills:
+**Write** — Open command palette → **"Templater: Insert template"** → pick `new-post` → type title and tags. Templater creates the folder and `index.md` with front matter:
 
 ```
 +++
 date = '2026-08-15T17:00:03-04:00'
 draft = false
-title = ''
-tags = []
+title = 'My Post Title'
+tags = ['hugo', 'tutorial']
+
+[params.cover]
+  image = "banner.png"
+  alt = "My Post Title"
+  relative = true
 +++
 ```
 
-Fill in the title, add tags, write your content.
+Write your content. Paste images — they land in the same folder.
+
+**CLI shortcut** — From WSL, you can also use the `new-post.sh` script:
+
+```bash
+./new-post.sh "My Post Title" "hugo,tutorial"
+```
+
+This creates the same page bundle structure without opening Obsidian.
 
 **Preview** — In WSL, sync and preview before publishing:
 
@@ -205,16 +222,16 @@ When GitHub Actions checks out the repo, that path does not exist on the Ubuntu 
 
 The `rsync` approach costs one extra command but keeps the pipeline reliable.
 
-### Why Not Obsidian Git Plugin?
+### Why Not Obsidian Git Plugin on Desktop?
 
-The Obsidian Git community plugin can auto-commit and push on a timer. Sounds perfect, but:
+The Obsidian Git plugin works great on iPhone (see the [iPhone pipeline post](/artark-ai/posts/2026-08-15-iphone-obsidian-git/)). But on desktop where you have WSL, the publish script is better because:
 
-1. You lose the Hugo build verification step — a broken front matter goes straight to production
+1. You get Hugo build verification before pushing — broken front matter never reaches production
 2. Two git clients (Obsidian on Windows + terminal on WSL) hitting the same remote causes conflicts
 3. Auto-commits every 5 minutes create noisy history
 4. The plugin operates at vault root — your repo structure (themes, config, workflow) would clutter the Obsidian sidebar
 
-Keeping git in WSL gives you control: preview before publish, meaningful commit messages, and one source of authority.
+On iPhone there is no alternative — Obsidian Git is the only way to push. On desktop, keep git in WSL for control.
 
 ### The Full Stack
 
