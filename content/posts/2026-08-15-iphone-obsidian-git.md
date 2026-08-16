@@ -13,7 +13,7 @@ Here is the setup.
 
 - iPhone with Obsidian installed (free from App Store)
 - GitHub repo with Hugo + GitHub Actions pipeline already working
-- GitHub Personal Access Token
+- GitHub Personal Access Token (fine-grained)
 
 ### Step 1: Generate a GitHub Token
 
@@ -22,8 +22,10 @@ Here is the setup.
    - **Token name:** `obsidian-iphone`
    - **Expiration:** 90 days (or longer)
    - **Repository access:** Only select repositories → pick your Hugo repo
-   - **Permissions → Contents:** Read and write
-3. Copy the token immediately — you will not see it again
+3. Under **Permissions**, click **"+ Add permissions"**
+   - Find **"Contents"** → set to **Read and write**
+   - **Metadata** (Read-only) is auto-added
+4. Generate token → copy it immediately
 
 ### Step 2: Create a Vault
 
@@ -34,26 +36,29 @@ Open Obsidian on iPhone → **Create new vault**:
 ### Step 3: Install and Configure Obsidian Git
 
 1. **Settings → Community plugins** → Turn off Restricted Mode
-2. **Browse** → search **"Obsidian Git"** → Install → Enable
-3. **Settings → Obsidian Git** (under Authentication):
-   - **Username:** your GitHub username
-   - **Password/Token:** paste the Personal Access Token
-
-Leave other settings at defaults.
+2. **Browse** → search **"Git"** → Install → Enable
+3. **Settings → Git** (under Community plugins):
+   - **Authentication → Username:** your GitHub username
+   - **Authentication → Password/Token:** paste the Personal Access Token
+   - **Pull on startup:** On
+   - **Push on commit-and-sync:** On
+   - **Pull on commit-and-sync:** On
+4. Leave everything else at default
 
 ### Step 4: Clone Your Repo
 
 1. Open command palette (swipe down on the editor)
 2. Run: **Obsidian Git: Clone an existing remote repo**
 3. Enter URL: `https://github.com/yourusername/your-repo.git`
-4. Wait for clone to complete
+4. Leave "custom git directory path" empty
+5. Wait for clone to complete
 
 After cloning, you will see the full repo structure in Obsidian's file browser. Your posts live in `content/posts/`.
 
 ### Step 5: Set Up Hugo Template
 
 1. Create a folder `_templates/` at the vault root
-2. Create a note `_templates/hugo-post` with this content:
+2. Create a note `_templates/hugo-post` (Obsidian auto-adds `.md`) with this content:
 
 ```
 +++
@@ -81,7 +86,7 @@ tags = []
 **Publish:**
 
 1. Open command palette (swipe down)
-2. Run: **Obsidian Git: Commit-and-push**
+2. Run: **Obsidian Git: Commit-and-sync**
 3. Enter a commit message
 
 Your site rebuilds via GitHub Actions and is live in about 60 seconds.
@@ -92,11 +97,21 @@ If you wrote posts on your desktop since last opening Obsidian on iPhone, the pl
 
 - Command palette → **Obsidian Git: Pull**
 
+### Troubleshooting
+
+| Error | Cause | Fix |
+|-------|-------|-----|
+| `403` on push | Token missing Contents: Read and write permission | Regenerate token with correct permissions |
+| `Push rejected: not a fast-forward` | Desktop force-pushed or history diverged | Delete vault, re-clone fresh |
+| `Merges with conflicts not supported` | Same file edited on two devices | Delete vault, re-clone, re-do your edit |
+| Template shows `{{date}}` literally | Core Templates plugin not enabled | Settings → Core plugins → Templates → On |
+| Extra `"` in date field | Template has stray quote | Fix template: use `'{{date:YYYY-MM-DDTHH:mm:ssZ}}'` |
+
 ### Conflict Prevention
 
 - Always let Obsidian pull on open before editing
 - Do not edit the same post on phone and desktop at the same time
-- If you do get a conflict, you will see `<<<<<<< HEAD` markers in the file — edit to resolve, then commit and push again
+- If conflicts happen: easiest fix is delete the vault and re-clone
 
 ### Limitations
 
