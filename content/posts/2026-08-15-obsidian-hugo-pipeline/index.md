@@ -3,6 +3,11 @@ date = '2026-08-15'
 draft = false
 title = 'Obsidian + Hugo + GitHub Pages on Windows 11'
 tags = ['obsidian', 'hugo', 'github-pages', 'wsl']
+
+[params.cover]
+  image = "banner.png"
+  alt = "Obsidian + Hugo + GitHub Pages on Windows 11"
+  relative = true
 +++
 
 Obsidian is a beautiful markdown editor. Hugo is a fast static site generator. GitHub Pages is free hosting with CI/CD. The challenge is wiring them together on Windows 11 where Obsidian runs natively but Hugo and git live in WSL.

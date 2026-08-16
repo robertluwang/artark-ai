@@ -3,6 +3,11 @@ date = '2026-08-15T18:17:00-04:00'
 draft = false
 title = 'Blog from iPhone with Obsidian Git'
 tags = ['obsidian', 'hugo', 'github-pages', 'iphone']
+
+[params.cover]
+  image = "banner.png"
+  alt = "Blog from iPhone with Obsidian Git"
+  relative = true
 +++
 
 You can write and publish blog posts from your iPhone using Obsidian and the Obsidian Git community plugin. No computer needed — write a post on the train, push to GitHub, and your Hugo site updates automatically.
