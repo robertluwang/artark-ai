@@ -60,33 +60,33 @@ Open Obsidian on iPhone → **Create new vault**:
 
 After cloning, you will see the full repo structure in Obsidian's file browser. Your posts live in `content/posts/`.
 
-### Step 5: Set Up Hugo Template
+### Step 5: Install Templater Plugin
 
-1. Create a folder `_templates/` at the vault root
-2. Create a note `_templates/hugo-post` (Obsidian auto-adds `.md`) with this content:
+The Templater community plugin lets you create a new page bundle post (folder + `index.md` + front matter) in one tap.
 
-```
-+++
-date = '{{date:YYYY-MM-DDTHH:mm:ssZ}}'
-draft = false
-title = ''
-tags = []
-+++
+1. **Settings → Community plugins → Browse** → search **"Templater"** → Install → Enable
+2. **Settings → Templater** → set **Template folder location:** `_templates`
+3. (Optional) Under **Template Hotkeys**, add `new-post` — this puts a one-tap icon in the sidebar ribbon
 
-```
+The repo already includes `_templates/new-post.md` which handles everything automatically.
 
-3. **Settings → Core plugins → Templates** → toggle On
-4. **Settings → Templates** → set **Template folder location:** `_templates`
+### Step 6: Configure Image Attachments
+
+So that images you paste or attach land next to the post (inside the page bundle folder):
+
+1. **Settings → Files and links**
+2. **Use `[[Wikilinks]]`** → turn OFF (outputs standard `![](image.png)` syntax)
+3. **Default location for new attachments** → **"Same folder as current file"**
 
 ### Writing and Publishing
 
 **Write a new post:**
 
 1. Open Obsidian → it auto-pulls the latest from GitHub
-2. Navigate to `content/posts/`
-3. Create a new note (name it like `2026-08-15-my-topic`)
-4. Tap the Templates icon in the ribbon (bottom-right) → select `hugo-post`
-5. Date fills in automatically. Type your title and start writing.
+2. Open command palette (swipe down) → **"Templater: Insert template"** → pick `new-post`
+3. Type your post title when prompted → type tags (comma-separated, or leave empty)
+4. Templater creates the page bundle folder + `index.md` and opens it
+5. Write your post. Paste or attach images — they land in the same folder automatically.
 
 **Publish:**
 
@@ -95,6 +95,20 @@ tags = []
 3. Enter a commit message
 
 Your site rebuilds via GitHub Actions and is live in about 60 seconds.
+
+### Adding Images
+
+Posts use Hugo **page bundles** — each post is a folder containing `index.md` plus any images:
+
+```
+content/posts/2026-08-16-my-post/
+├── index.md
+├── banner.png      ← cover image (shown on listing + post header)
+└── screenshot.png  ← inline image
+```
+
+- **Cover image:** the `new-post` template pre-fills `[params.cover]` pointing to `banner.png`. Drop or paste a banner image and name it `banner.png`.
+- **Inline images:** paste any image while editing — Obsidian inserts `![](filename.png)` and saves the file in the same folder. Hugo picks it up automatically.
 
 ### Pulling Updates from Desktop
 
@@ -109,8 +123,9 @@ If you wrote posts on your desktop since last opening Obsidian on iPhone, the pl
 | `403` on push | Token missing Contents: Read and write permission | Regenerate token with correct permissions |
 | `Push rejected: not a fast-forward` | Desktop force-pushed or history diverged | Delete vault, re-clone fresh |
 | `Merges with conflicts not supported` | Same file edited on two devices | Delete vault, re-clone, re-do your edit |
-| Template shows `{{date}}` literally | Core Templates plugin not enabled | Settings → Core plugins → Templates → On |
-| Extra `"` in date field | Template has stray quote | Fix template: use `'{{date:YYYY-MM-DDTHH:mm:ssZ}}'` |
+| Templater shows raw `<%` code | Templater plugin not enabled | Settings → Community plugins → enable Templater |
+| Image shows as broken link | Wikilinks still on, outputs `![[img]]` | Settings → Files and links → turn off Wikilinks |
+| Image not in post folder | Attachment location wrong | Set "Default location for new attachments" to "Same folder as current file" |
 
 ### Conflict Prevention
 
@@ -127,6 +142,7 @@ If you wrote posts on your desktop since last opening Obsidian on iPhone, the pl
 | HTTPS only (no SSH) | Use Personal Access Token |
 | Token expires | Regenerate on GitHub, update in plugin settings |
 | Slow clone on large repos | Only happens once — incremental pulls are fast |
+| Large images slow to push | Keep images under 1MB, use .jpg/.webp for photos |
 
 ### Security
 
