@@ -66,6 +66,9 @@ Under **Settings → Files & Links**:
 
 - **New link format:** Relative path to file
 - **Default location for new notes:** `posts/`
+- **Use `[[Wikilinks]]`:** turn OFF
+
+> **Tip:** By default Obsidian uses wiki-style `![[image.png]]` syntax for images. Turning off Wikilinks makes it output `![](image.png)` instead — standard Markdown that your sync script and Hugo both understand without extra processing.
 
 ### Step 4: Create the Publish Script
 
