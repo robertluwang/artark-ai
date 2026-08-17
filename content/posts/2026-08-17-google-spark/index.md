@@ -1,6 +1,6 @@
 +++
 date = '2026-08-17T12:19:27-04:00'
-draft = false
+draft = true
 title = "Inside Google Spark: How Google's 24/7 Background Agent Actually Works"
 tags = ['gemini', 'spark', 'skill', 'task']
 
@@ -8,7 +8,10 @@ tags = ['gemini', 'spark', 'skill', 'task']
   image = "banner.png"
   alt = "google spark"
   relative = true
+
 +++
+
+# Inside Google Spark: How Google's 24/7 Background Agent Actually Works
 
 Most interactions with modern AI follow a predictable, reactive cycle: you open a chat interface, type a prompt, wait for a response, copy the output, and close the tab. The moment that session ends, the compute stops, the context clears, and the AI goes dormant until you prompt it again.
 
