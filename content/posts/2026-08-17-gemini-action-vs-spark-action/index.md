@@ -14,7 +14,7 @@ I set up two morning automations to test how Gemini handles recurring routines: 
 
 When the notifications showed up on my phone, the output looked completely different.
 
-## standard Gemini action
+## Standard Gemini Action
 
 The standard Gemini schedule runs as a basic query execution. You type a prompt into the conversation box, pick a time under the settings menu, and Gemini stores that string as an event. When the clock hits eight, it acts as if you just sat down and pasted that exact text into the chat.
 
@@ -26,7 +26,7 @@ Search the web for the latest AI trending news from the past day and draft an em
 
 The resulting notification opened a standard conversation thread. The model searched for news, picked five items, and wrote a conversational summary. It included greetings, small talk, broad bullet points, and commentary. Because a standard prompt is open to interpretation every time it fires, the output changes format depending on whatever the base model decides on that day. There were no fixed boundaries on how many stories to grab, no uniform structure for citations, and no persistent state. It did not create a clean draft in Gmail; it just printed text inside a chat bubble for me to copy and paste.
 
-## Gemini Spark schedule task
+## Gemini Spark Schedule Task
 
 Setting up the same routine in Gemini Spark required a different path. Spark does not treat recurring tasks as loose text prompts. It treats them as structured playbooks called skills, running on isolated virtual machines in the background.
 
@@ -53,7 +53,7 @@ Run my /ai-news-briefing skill.
 
 When Spark executed the job, it loaded the sandbox environment, parsed the four-step logic, and ran Google Search through its native web tools. The output followed the schema to the letter: exactly three stories, each with a title line, two descriptive sentences, and the direct source link. It skipped the introductory conversational pleasantries entirely and dropped the formatted text straight into my Gmail drafts folder, ready for a final check.
 
-## Operational differences
+## Operational Differences
 
 The operational differences between the two systems boil down to a few practical facts:
 
