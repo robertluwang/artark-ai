@@ -1,13 +1,13 @@
 baseURL = 'https://robertluwang.github.io/artark-ai/'
 defaultContentLanguage = 'en'
-title = 'My Tech Blog'
+title = 'Artark AI'
 theme = 'papermod'
 
 [params]
   env = "production"
-  title = "My Tech Blog"
-  description = "Minimal tech notes and code snippets"
-  author = "Me"
+  title = "Artark AI"
+  description = "Minimal AI tech notes and code snippets"
+  author = "robertluwang"
   showReadingTime = true
   showShareButtons = true
   showPostNavLinks = true
