@@ -27,15 +27,18 @@ Obsidian is a Windows desktop app. Hugo and git run in WSL (Ubuntu). They need t
 
 ### The Solution: Vault + Publish Script
 
-Keep two copies: Obsidian writes to a Windows-native folder, a one-line publish script syncs to the Hugo repo and pushes.
+Keep two copies: Obsidian writes to a Windows-native folder, a one-line publish script syncs to the Hugo repo and pushes. The vault uses the same `content/posts/` structure as the Hugo repo — same layout on both desktop and iPhone.
 
 ```
 Obsidian (Win11)                              WSL
 ┌─────────────────────────────┐              ┌──────────────────────────────┐
 │ C:\Users\you\               │              │ ~/hugo-site/                 │
 │   obsidian-vaults\          │  publish.sh  │   content/posts/             │
-│     my-blog\                │ ──────────▶  │     (real files, in git)     │
-│       posts\*.md            │   rsync      │                              │
+│     my-blog\                │ ──────────▶  │     2026-08-17-my-post/      │
+│       content/posts/        │   rsync      │       index.md               │
+│         2026-08-17-my-post/ │              │       banner.png             │
+│           index.md          │              │                              │
+│           banner.png        │              │                              │
 └─────────────────────────────┘              └──────────────┬───────────────┘
                                                             │ git push
                                                             ▼
@@ -47,13 +50,13 @@ Obsidian (Win11)                              WSL
 From WSL:
 
 ```bash
-mkdir -p /mnt/c/Users/you/obsidian-vaults/my-blog/posts
+mkdir -p /mnt/c/Users/you/obsidian-vaults/my-blog/content/posts
 ```
 
 Copy any existing posts into it:
 
 ```bash
-cp ~/hugo-site/content/posts/*.md /mnt/c/Users/you/obsidian-vaults/my-blog/posts/
+cp -r ~/hugo-site/content/posts/* /mnt/c/Users/you/obsidian-vaults/my-blog/content/posts/
 ```
 
 ### Step 2: Open the Vault in Obsidian
@@ -63,17 +66,17 @@ In Obsidian on Windows → **Create new vault**:
 - **Vault name:** `my-blog`
 - **Location:** `C:\Users\you\obsidian-vaults`
 
-You should see your `posts/` folder in the sidebar immediately.
+You should see your `content/posts/` folder in the sidebar immediately.
 
 ### Step 3: Configure Obsidian
 
 Under **Settings → Files & Links**:
 
 - **New link format:** Relative path to file
-- **Default location for new notes:** `posts/`
+- **Default location for new attachments:** Same folder as current file
 - **Use `[[Wikilinks]]`:** turn OFF
 
-> **Tip:** By default Obsidian uses wiki-style `![[image.png]]` syntax for images. Turning off Wikilinks makes it output `![](image.png)` instead — standard Markdown that your sync script and Hugo both understand without extra processing.
+> **Tip:** Turning off Wikilinks makes Obsidian output `![](image.png)` instead of `![[image.png]]` — standard Markdown that Hugo understands. Setting attachments to "Same folder as current file" ensures images land inside the page bundle alongside `index.md`.
 
 ### Step 4: Create the Publish Script
 
@@ -83,19 +86,24 @@ Save this as `publish.sh` in your Hugo site root:
 #!/bin/bash
 # publish.sh — Sync posts between Obsidian vault and Hugo repo, build, push
 # Usage: ./publish.sh [commit message]
+#
+# Configure this environment variable (e.g. in ~/.bashrc):
+#   OBSIDIAN_VAULT_POSTS - path to Obsidian vault content/posts folder
 
-VAULT="/mnt/c/Users/you/obsidian-vaults/my-blog/posts"
-HUGO_POSTS="$HOME/hugo-site/content/posts"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+HUGO_SITE="${HUGO_SITE_DIR:-$SCRIPT_DIR}"
+HUGO_POSTS="$HUGO_SITE/content/posts"
+VAULT="${OBSIDIAN_VAULT_POSTS:?Set OBSIDIAN_VAULT_POSTS to your Obsidian vault content/posts folder}"
 
-cd "$HOME/hugo-site"
+cd "$HUGO_SITE"
 
 # Pull latest (in case iPhone pushed new posts)
 git pull --rebase origin main
 
-# Sync REPO → VAULT (so Obsidian sees iPhone posts)
-rsync -av --delete --exclude='.obsidian' "$HUGO_POSTS/" "$VAULT/"
+# Sync NEW files from repo → vault (posts from other devices)
+rsync -av --ignore-existing "$HUGO_POSTS/" "$VAULT/"
 
-# Sync VAULT → REPO (pick up desktop Obsidian edits)
+# Sync VAULT → REPO (vault is the source of truth for local edits)
 rsync -av --delete --exclude='.obsidian' "$VAULT/" "$HUGO_POSTS/"
 
 # Show changes
@@ -121,67 +129,96 @@ git push origin main
 echo "✓ Published. Site live in ~60 seconds."
 ```
 
-Make it executable:
+Make it executable and set the env var:
 
 ```bash
 chmod +x publish.sh
+echo 'export OBSIDIAN_VAULT_POSTS="/mnt/c/Users/you/obsidian-vaults/my-blog/content/posts"' >> ~/.bashrc
+source ~/.bashrc
 ```
 
-### Step 5: Add `.obsidian/` to `.gitignore`
+### Step 5: Set Up Templater for New Posts
 
-Just in case Obsidian ever creates config files near the repo:
+The **Templater** community plugin creates a complete page bundle (folder + `index.md` + front matter) in one action.
 
-```text
-/public/
-/resources/
-.hugo_build.lock
-.obsidian/
+1. **Settings → Community plugins** → Browse → install **Templater** → Enable
+2. Create a folder `_templates/` at the vault root
+3. Create `_templates/new-post.md`:
+
+```javascript
+<%*
+const title = await tp.system.prompt("Post title");
+if (!title) return;
+const tags = await tp.system.prompt("Tags (comma-separated, or leave empty)");
+const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const date = tp.date.now("YYYY-MM-DD");
+const datetime = tp.date.now("YYYY-MM-DDTHH:mm:ssZ");
+const folder = `content/posts/${date}-${slug}`;
+
+// Format tags
+let tagLine = "tags = []";
+if (tags && tags.trim()) {
+    const tagArray = tags.split(',').map(t => `'${t.trim()}'`).join(', ');
+    tagLine = `tags = [${tagArray}]`;
+}
+
+const content = `+++
+date = '${datetime}'
+draft = false
+title = "${title}"
+${tagLine}
+
+[params.cover]
+  image = "banner.png"
+  alt = "${title}"
+  relative = true
++++
+
+`;
+
+await app.vault.createFolder(folder);
+await app.vault.create(`${folder}/index.md`, content);
+await app.workspace.openLinkText(`${folder}/index.md`, "");
+
+// Remove the temporary note that triggered this template
+if (tp.file.title !== "index") {
+    await app.vault.trash(tp.file);
+}
+%>
 ```
 
-### Step 5: Set Up Template for Hugo Front Matter
+4. **Settings → Templater** → set **Template folder location:** `_templates`
 
-Manually typing front matter for every post is tedious. Obsidian's built-in **Templates** core plugin auto-fills it.
+**Usage:** Create any new note → run Templater → select `new-post`. It prompts for title and tags, creates the page bundle folder with `index.md`, and opens it for editing. Drop a `banner.png` into the same folder for the cover image.
 
-1. **Settings → Core plugins → Templates** → toggle On
-2. Create a folder `_templates/` at the vault root (outside `posts/` — won't sync to GitHub)
-3. Create `_templates/hugo-post` (Obsidian auto-adds `.md`):
+> **Important:** The title uses double quotes (`title = "..."`) in the TOML front matter. Single quotes break on apostrophes (e.g. `Google's` would terminate the string early).
+
+You can also keep the **core Templates** plugin with a simple `hugo-post` template for quick notes on iPhone (where Templater isn't available):
 
 ```
 +++
 date = '{{date:YYYY-MM-DDTHH:mm:ssZ}}'
 draft = false
-title = ''
+title = ""
 tags = []
 +++
 
 ```
-
-4. **Settings → Templates** → set **Template folder location:** `_templates`
-5. **Date format:** `YYYY-MM-DDTHH:mm:ssZ`
-
-**Usage:** Create a new note in `posts/`, tap the Templates icon in the ribbon (bottom-right on mobile, left sidebar on desktop) → select `hugo-post`. Date auto-fills. Type your title and start writing.
-
-Works identically on desktop and iPhone — no community plugins needed.
 
 ### Daily Workflow
 
-**Write** — Create a new note in `posts/` → tap Templates icon → front matter auto-fills:
+**Write** — Create any new note → run Templater → `new-post` → fills title, tags, creates page bundle:
 
 ```
-+++
-date = '2026-08-15T17:00:03-04:00'
-draft = false
-title = ''
-tags = []
-+++
+content/posts/2026-08-17-my-post/
+├── index.md      ← front matter + content
+└── banner.png    ← cover image (drop in manually)
 ```
 
-Fill in the title, add tags, write your content.
-
-**Preview** — In WSL, sync and preview before publishing:
+**Preview** — In WSL:
 
 ```bash
-rsync -av /mnt/c/Users/you/obsidian-vaults/my-blog/posts/ ~/hugo-site/content/posts/
+rsync -av /mnt/c/Users/you/obsidian-vaults/my-blog/content/posts/ ~/hugo-site/content/posts/
 hugo server -D
 ```
 
@@ -198,29 +235,30 @@ That is the entire process. Write in Obsidian, run one command, site is live.
 It seems elegant — symlink `content/posts/` to the Windows vault folder and everything is one source of truth. It works locally. Hugo builds through it. But git stores the symlink target path literally:
 
 ```
-content/posts -> /mnt/c/Users/you/obsidian-vaults/my-blog/posts
+content/posts -> /mnt/c/Users/you/obsidian-vaults/my-blog/content/posts
 ```
 
 When GitHub Actions checks out the repo, that path does not exist on the Ubuntu runner. The build fails with missing content. Real files in the repo are the only way CI/CD works.
 
 The `rsync` approach costs one extra command but keeps the pipeline reliable.
 
-### Why Not Obsidian Git Plugin?
+### Why Not Obsidian Git Plugin on Desktop?
 
-The Obsidian Git community plugin can auto-commit and push on a timer. Sounds perfect, but:
+The Obsidian Git community plugin can auto-commit and push on a timer. Sounds perfect for desktop, but:
 
 1. You lose the Hugo build verification step — a broken front matter goes straight to production
 2. Two git clients (Obsidian on Windows + terminal on WSL) hitting the same remote causes conflicts
 3. Auto-commits every 5 minutes create noisy history
-4. The plugin operates at vault root — your repo structure (themes, config, workflow) would clutter the Obsidian sidebar
 
 Keeping git in WSL gives you control: preview before publish, meaningful commit messages, and one source of authority.
+
+> **Note:** Obsidian Git works great on **iPhone** where WSL isn't available — it pushes directly to GitHub via HTTPS + Personal Access Token. See the companion post on iPhone setup.
 
 ### The Full Stack
 
 ```
-Obsidian (Win11 desktop)     — write markdown
-rsync (WSL)                  — sync to Hugo repo
+Obsidian (Win11 desktop)     — write markdown (Templater creates page bundles)
+rsync (WSL)                  — sync vault content/posts/ to Hugo repo
 Hugo (WSL)                   — build static HTML
 Git (WSL)                    — push to GitHub
 GitHub Actions (cloud)       — build + deploy
