@@ -1,6 +1,6 @@
 +++
 date = '2026-08-17T12:19:27-04:00'
-draft = true
+draft = false
 title = "Inside Google Spark: How Google's 24/7 Background Agent Actually Works"
 tags = ['gemini', 'spark', 'skill', 'task']
 
