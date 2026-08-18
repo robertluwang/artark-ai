@@ -1,13 +1,13 @@
-+++
-date = '2026-08-08T16:27:40-04:00'
-draft = false
-title = 'Hugo Blog Pipeline'
++++ 
+date = '2026-08-08T16:27:40-04:00' 
+draft = false 
+title = 'Hugo Blog Pipeline' 
 tags = ['git','hugo','github-pages']
+images = ["https://robertluwang.github.io/artark-ai/posts/2026-08-08-hugo-blog/banner.png"]
 
-[params.cover]
-  images = ["banner.png"]
-  alt = "Hugo Blog Pipeline"
-  relative = false
+[params.cover] 
+image = "banner.png" 
+alt = "Hugo Blog Pipeline" 
 +++
 
 I got tired of WordPress. Not because it crashed or ran slow — it worked fine — but because every time I sat down to write, I was fighting the editor instead of writing. The block system turns a simple paragraph into a drag-and-drop puzzle. I wanted a blogging pipeline where I write a markdown file, push it to git, and the post goes live. That is it. No block picker, no sidebar toggles, no plugin updates, no database.
