@@ -7,7 +7,7 @@ tags = ['git','hugo','github-pages']
 [params.cover]
   image = "banner.png"
   alt = "Hugo Blog Pipeline"
-  relative = true
+  relative = false
 +++
 
 I got tired of WordPress. Not because it crashed or ran slow — it worked fine — but because every time I sat down to write, I was fighting the editor instead of writing. The block system turns a simple paragraph into a drag-and-drop puzzle. I wanted a blogging pipeline where I write a markdown file, push it to git, and the post goes live. That is it. No block picker, no sidebar toggles, no plugin updates, no database.
