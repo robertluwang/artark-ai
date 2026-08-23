@@ -5,7 +5,7 @@ title = 'Timers vs. True Agents: What Happened When I Tested Gemini Spark Agains
 tags = ['gemini', 'action', 'spark', 'skill']
 
 [params.cover]
-  image = "banner.png"
+  image = "banner.jpg"
   alt = "gemini-action-vs-spark-action"
   relative = true
 +++

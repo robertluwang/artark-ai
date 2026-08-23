@@ -5,7 +5,7 @@ title = 'Blog from iPhone with Obsidian Git'
 tags = ['obsidian', 'hugo', 'github-pages', 'iphone']
 
 [params.cover]
-  image = "banner.png"
+  image = "banner.jpg"
   alt = "Blog from iPhone with Obsidian Git"
   relative = true
 +++

@@ -5,7 +5,7 @@ title = 'Obsidian + Hugo + GitHub Pages on Windows 11'
 tags = ['obsidian', 'hugo', 'github-pages', 'wsl']
 
 [params.cover]
-  image = "banner.png"
+  image = "banner.jpg"
   alt = "Obsidian + Hugo + GitHub Pages on Windows 11"
   relative = true
 +++
@@ -169,7 +169,7 @@ title = "${title}"
 ${tagLine}
 
 [params.cover]
-  image = "banner.png"
+  image = "banner.jpg"
   alt = "${title}"
   relative = true
 +++

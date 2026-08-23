@@ -5,7 +5,7 @@ title = 'Hugo Blog Pipeline'
 tags = ['git','hugo','github-pages']
 
 [params.cover]
-  image = "banner.png"
+  image = "banner.jpg"
   alt = "Hugo Blog Pipeline"
   relative = true
 +++

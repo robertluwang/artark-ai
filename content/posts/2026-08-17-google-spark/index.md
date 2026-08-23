@@ -5,7 +5,7 @@ title = "Inside Google Spark: How Google's 24/7 Background Agent Actually Works"
 tags = ['gemini', 'spark', 'skill', 'task']
 
 [params.cover]
-  image = "banner.png"
+  image = "banner.jpg"
   alt = "google spark"
   relative = true
 +++
