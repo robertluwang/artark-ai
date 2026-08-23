@@ -1,6 +1,6 @@
 +++
 date = '2026-08-23T09:58:00-04:00'
-lastmod = '2026-08-23T11:45:00-04:00'
+lastmod = '2026-08-23T12:33:22-04:00'
 draft = false
 title = 'The Complete Hugo Blogging Pipeline on Windows 11 WSL'
 tags = ['hugo', 'wsl', 'git', 'github-pages', 'obsidian']
@@ -103,10 +103,20 @@ A Hugo page bundle is a folder holding `index.md` plus its images. Hand-building
 ```bash
 ./scripts/new-post.sh "My Post Title"
 ./scripts/new-post.sh "My Post Title" --tags hugo,wsl --banner ~/Downloads/img.png
+./scripts/new-post.sh "My Post Title" --slug short-name
 ./scripts/new-post.sh "My Post Title" --publish
 ```
 
 It slugifies the title, creates `content/posts/YYYY-MM-DD-slug/`, writes the front matter, and runs the banner through the fitter if you pass one.
+
+By default the URL is derived from the title, which is fine until the title runs long — this post would otherwise have landed at `2026-08-23-the-complete-hugo-blogging-pipeline-on-windows-11-wsl/`. `--slug` decouples the two:
+
+```bash
+./scripts/new-post.sh "The Complete Hugo Blogging Pipeline on Windows 11 WSL" \
+  --slug hugo-pipeline-win11-wsl
+```
+
+Short URL, full title on the page and in the social card. It also means retitling later never tempts you into renaming the folder, so links you have already shared keep working. An explicit slug is normalised the same way a derived one is, and you are told when it changes.
 
 Posts default to `draft = true`. The two failure modes are asymmetric: publishing half a post is visible and fixable in a minute, whereas forgetting to flip a draft means the post never appears and gives you no signal at all — so the default guards the confusing one, and `--publish` opts out.
 
