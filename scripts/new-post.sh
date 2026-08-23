@@ -46,6 +46,15 @@ while [ $# -gt 0 ]; do
     esac
 done
 
+# The cover filename follows the banner's format: PNG suits flat graphics,
+# JPEG is far smaller for photographic/AI-generated art.
+COVER="banner.png"
+if [ -n "$BANNER" ]; then
+    case "${BANNER,,}" in
+        *.jpg|*.jpeg) COVER="banner.jpg" ;;
+    esac
+fi
+
 if [ -z "$TITLE" ]; then
     read -rp "Post title: " TITLE
     [ -n "$TITLE" ] || { echo "ERROR: title is required" >&2; exit 1; }
@@ -97,7 +106,7 @@ title = $TITLE_TOML
 $TAG_LINE
 
 [params.cover]
-  image = "banner.png"
+  image = "$COVER"
   alt = $ALT_TOML
   relative = true
 +++
@@ -111,12 +120,20 @@ if [ -n "$BANNER" ]; then
         echo "ERROR: banner '$BANNER' not found — post created without one." >&2
         exit 1
     fi
-    cp "$BANNER" "$DIR/banner.png"
-    echo "✓ copied banner  $DIR/banner.png"
+    # Normalise to the 1200x630 / 1.91:1 shape social cards render at, so an
+    # AI-generated 16:9 image is not cropped unpredictably by the platform.
+    if command -v python3 >/dev/null 2>&1 \
+       && python3 -c "import PIL" >/dev/null 2>&1; then
+        printf '✓ banner  '
+        "$(dirname "$0")/fit-banner.py" "$BANNER" "$DIR/$COVER"
+    else
+        cp "$BANNER" "$DIR/$COVER"
+        echo "✓ copied banner  $DIR/$COVER (Pillow missing — not resized)"
+    fi
 else
     echo
     echo "NEXT: add a banner before publishing"
-    echo "      cp /path/to/image.png $DIR/banner.png"
+    echo "      ./scripts/fit-banner.py /path/to/image.png $DIR/$COVER"
     echo "      1200x630 is the size social cards want."
     if [ "$DRAFT" = "false" ]; then
         echo
