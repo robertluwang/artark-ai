@@ -67,16 +67,42 @@ git init
 
 ### Step 2: Add the Pipeline
 
+**Option A — git clone (recommended):**
+
+```bash
+git clone https://github.com/robertluwang/hugo-blog-pipeline.git /tmp/hugo-blog-pipeline
+cp -r /tmp/hugo-blog-pipeline/scripts .
+cp -r /tmp/hugo-blog-pipeline/_templates .
+cp -r /tmp/hugo-blog-pipeline/.github .
+cp /tmp/hugo-blog-pipeline/publish.sh .
+cp /tmp/hugo-blog-pipeline/.gitattributes .
+cp /tmp/hugo-blog-pipeline/.gitignore .
+cp /tmp/hugo-blog-pipeline/hugo.toml.example .
+rm -rf /tmp/hugo-blog-pipeline
+```
+
+**Option B — one-liner (no clone needed):**
+
 ```bash
 curl -sL https://github.com/robertluwang/hugo-blog-pipeline/archive/main.tar.gz \
   | tar xz --strip-components=1 --wildcards \
     '*/scripts/*' '*/.github/*' '*/publish.sh' '*/_templates/*' \
-    '*/.gitattributes' '*/.gitignore'
+    '*/.gitattributes' '*/.gitignore' '*/hugo.toml.example'
 ```
 
-This drops in the scripts, CI workflow, templates, and config files. Nothing else — no sample posts, no theme, no `hugo.toml`.
+Both drop in the scripts, CI workflow, templates, and config files. Nothing else — no sample posts, no theme.
 
-### Step 3: Add a Theme
+### Step 3: Set Up Python Venv
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install pillow
+```
+
+The venv is gitignored. `fit-banner.py` needs Pillow; without it, `new-post.sh --banner` falls back to a plain copy and `check-posts.sh` skips the dimension check.
+
+### Step 4: Add a Theme
 
 Any Hugo theme works. PaperMod is minimal and fast:
 
@@ -84,7 +110,7 @@ Any Hugo theme works. PaperMod is minimal and fast:
 git submodule add https://github.com/adityatelange/hugo-PaperMod.git themes/papermod
 ```
 
-### Step 4: Configure
+### Step 5: Configure
 
 ```bash
 cp hugo.toml.example hugo.toml
@@ -110,7 +136,7 @@ Also edit `.github/workflows/hugo.yml` — the `--baseURL` on the build line:
 run: hugo --minify --baseURL "https://yourname.github.io/my-blog/"
 ```
 
-### Step 5: Create Your First Post
+### Step 6: Create Your First Post
 
 ```bash
 source .venv/bin/activate
@@ -130,7 +156,7 @@ hugo server -D
 # → http://localhost:1313/
 ```
 
-### Step 6: Push to GitHub
+### Step 7: Push to GitHub
 
 Create an empty repo on GitHub (no README, no .gitignore, no license — you already have them).
 
@@ -145,7 +171,7 @@ Go to **Settings → Pages → Source → GitHub Actions**. That is the only man
 
 Within a minute your site is live at `https://yourname.github.io/my-blog/`.
 
-### Step 7 (Optional): Add the iPhone
+### Step 8 (Optional): Add the iPhone
 
 If you also want to write from your phone:
 
