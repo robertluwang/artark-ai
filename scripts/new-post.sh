@@ -132,13 +132,20 @@ if [ -n "$BANNER" ]; then
     fi
 else
     echo
-    echo "NEXT: add a banner before publishing"
+    echo "WARNING: no banner yet — this post has no social card image."
+    echo
+    echo "  Add it with the fitter, not cp, so it gets sized to 1200x630 and"
+    echo "  the full-resolution original is archived:"
+    echo
     echo "      ./scripts/fit-banner.py /path/to/image.png $DIR/$COVER"
-    echo "      1200x630 is the size social cards want."
+    echo
+    echo "  A plain cp leaves whatever your image tool produced. ./publish.sh"
+    echo "  would notice and offer to fit it, but 'git add/commit/push' will"
+    echo "  not — CI only warns, so an oversized banner publishes silently."
     if [ "$DRAFT" = "false" ]; then
         echo
-        echo "This post is draft = false, so ./scripts/check-posts.sh will fail"
-        echo "until banner.png exists."
+        echo "  This post is draft = false, so check-posts.sh FAILS until"
+        echo "  $COVER exists — locally and in CI."
     fi
 fi
 
