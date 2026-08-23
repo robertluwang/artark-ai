@@ -9,12 +9,16 @@
 # Usage:
 #   ./scripts/new-post.sh "My Post Title"
 #   ./scripts/new-post.sh "My Post Title" --tags hugo,git --banner ~/Pictures/x.png
+#   ./scripts/new-post.sh "My Post Title" --slug short-name
 #   ./scripts/new-post.sh "My Post Title" --publish
 #
 # Posts are created as draft = true, so an unfinished post can be committed
 # safely. Set draft = false (or use --publish) when it is ready to go live.
 #
 # Options:
+#   --slug NAME      Folder name instead of one derived from the title. Keeps
+#                    the URL short and stable when the title is long, and lets
+#                    you retitle later without changing the URL.
 #   --tags a,b,c     Comma-separated tags
 #   --banner FILE    Copy FILE into the bundle as banner.png
 #   --publish        Create with draft = false — goes live on the next push
@@ -24,12 +28,14 @@ set -euo pipefail
 cd "$(cd "$(dirname "$0")/.." && pwd)"
 
 TITLE=""
+SLUG_OVERRIDE=""
 TAGS=""
 BANNER=""
 DRAFT="true"
 
 while [ $# -gt 0 ]; do
     case "$1" in
+        --slug)   SLUG_OVERRIDE="${2:?--slug needs a value}"; shift 2 ;;
         --tags)   TAGS="${2:?--tags needs a value}"; shift 2 ;;
         --banner) BANNER="${2:?--banner needs a path}"; shift 2 ;;
         --publish) DRAFT="false"; shift ;;
@@ -60,11 +66,23 @@ if [ -z "$TITLE" ]; then
     [ -n "$TITLE" ] || { echo "ERROR: title is required" >&2; exit 1; }
 fi
 
-# "My Post: Title!" -> "my-post-title"
-SLUG=$(printf '%s' "$TITLE" \
+# "My Post: Title!" -> "my-post-title". Normalise an explicit --slug the same
+# way, so a stray space or capital cannot produce an odd URL.
+SLUG_SOURCE=${SLUG_OVERRIDE:-$TITLE}
+SLUG=$(printf '%s' "$SLUG_SOURCE" \
     | tr '[:upper:]' '[:lower:]' \
     | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//')
-[ -n "$SLUG" ] || { echo "ERROR: title produced an empty slug" >&2; exit 1; }
+if [ -z "$SLUG" ]; then
+    if [ -n "$SLUG_OVERRIDE" ]; then
+        echo "ERROR: --slug '$SLUG_OVERRIDE' contains no usable characters" >&2
+    else
+        echo "ERROR: title produced an empty slug — pass --slug" >&2
+    fi
+    exit 1
+fi
+if [ -n "$SLUG_OVERRIDE" ] && [ "$SLUG" != "$SLUG_OVERRIDE" ]; then
+    echo "note: slug normalised to '$SLUG'"
+fi
 
 DIR="content/posts/$(date +%Y-%m-%d)-$SLUG"
 if [ -e "$DIR" ]; then
