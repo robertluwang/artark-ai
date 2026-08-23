@@ -23,6 +23,7 @@ NOW=$(date +%s)
 problems=0
 warnings=0
 checked=0
+drafts=0
 
 # Front matter = everything above the closing +++ (TOML) or --- (YAML).
 frontmatter() {
@@ -38,6 +39,16 @@ for post in content/posts/*/index.md; do
     checked=$((checked + 1))
 
     fm=$(frontmatter "$post")
+
+    # Drafts are excluded from the build, so an incomplete draft (e.g. a
+    # scaffolded post whose banner isn't in place yet) must not fail CI.
+    if printf '%s\n' "$fm" | grep -qP '^\s*draft\s*=\s*true'; then
+        # Listed, not silent: a post left as a draft by accident never appears
+        # on the live site and gives no other signal that it is missing.
+        echo "DRAFT  $slug: draft = true — will NOT be published."
+        drafts=$((drafts + 1))
+        continue
+    fi
 
     cover=$(printf '%s\n' "$fm" | grep -oP '^\s*image\s*=\s*"\K[^"]+' | head -1)
 
@@ -88,7 +99,7 @@ for post in content/posts/*.md; do
 done
 
 echo
-echo "Checked $checked post(s): $problems error(s), $warnings warning(s)."
+echo "Checked $checked post(s) ($drafts draft(s) skipped): $problems error(s), $warnings warning(s)."
 
 if [ "$problems" -gt 0 ]; then
     echo "FAILED — fix the errors above before publishing."
