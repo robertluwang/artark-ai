@@ -28,6 +28,8 @@ Usage:
 the rest archives the original, writes a fitted banner.jpg, updates the front
 matter and removes the old file. Useful after publishing from a phone, where
 nothing resizes the image.
+
+Exit codes: 0 = clean or applied, 2 = --dry-run found work pending.
 """
 
 import argparse
@@ -231,10 +233,13 @@ def scan(args):
 
     if todo == 0:
         print("  nothing to adjust — all covers within limits")
-    elif args.dry_run:
+        return 0
+    if args.dry_run:
+        # Exit 2 so a caller can tell "work pending" from "all clean" without
+        # parsing this output.
         print(f"\n  {todo} banner(s) would be adjusted. Re-run without --dry-run.")
-    else:
-        print(f"\n  {todo} banner(s) adjusted. Review with: git status")
+        return 2
+    print(f"\n  {todo} banner(s) adjusted. Review with: git status")
     return 0
 
 

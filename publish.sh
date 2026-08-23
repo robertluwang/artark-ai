@@ -26,6 +26,30 @@ if ! git pull --rebase origin main; then
     exit 1
 fi
 
+echo "==> Checking banners"
+# Report only. A banner that is heavy or the wrong shape still publishes, so
+# this must not change files behind your back — it asks first.
+scan_rc=0
+./scripts/fit-banner.py --scan --dry-run || scan_rc=$?
+if [ "$scan_rc" -eq 2 ]; then
+    if [ -t 0 ]; then
+        read -rp "Fit these banners now? Originals are archived first. [y/N] " reply
+        case "$reply" in
+            y|Y|yes|YES)
+                ./scripts/fit-banner.py --scan
+                ;;
+            *)
+                echo "Skipped — publishing with the banners as they are."
+                ;;
+        esac
+    else
+        echo "Not a terminal — skipping. Run ./scripts/fit-banner.py --scan to fit them."
+    fi
+elif [ "$scan_rc" -ne 0 ]; then
+    echo "ERROR: banner scan failed (exit $scan_rc)." >&2
+    exit 1
+fi
+
 echo "==> Validating posts"
 ./scripts/check-posts.sh
 
