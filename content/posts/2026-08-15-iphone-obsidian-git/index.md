@@ -112,6 +112,26 @@ If you wrote posts on your desktop since last opening Obsidian on iPhone, the pl
 | Template shows `{{date}}` literally | Core Templates plugin not enabled | Settings → Core plugins → Templates → On |
 | Extra `"` in date field | Template has stray quote | Fix template: use `'{{date:YYYY-MM-DDTHH:mm:ssZ}}'` |
 
+### Recommended Git Plugin Settings
+
+If you also write posts from a desktop, the default auto-sync can cause data loss — the plugin may commit deletions of files that exist in git but not yet on your iPhone disk.
+
+| Setting | Value | Why |
+|---------|-------|-----|
+| Auto commit-and-sync interval | **0** (disabled) | Stop blind auto-commits that delete desktop-created files |
+| Pull on startup | **Enabled** | Always get latest when you open Obsidian |
+| Merge strategy on conflicts | **Their changes** | Remote (desktop) wins if conflict |
+
+Then when you finish writing a post, manually trigger **"Commit and Sync"** from command palette. That's safe because:
+
+- You just pulled on startup (desktop posts are on disk)
+- You're only adding your new post
+- The commit won't contain deletions of files you didn't touch
+
+The rule is simple: **don't let it auto-commit when you haven't checked what's on disk first.**
+
+Also: **don't use the iPhone GitHub app** to edit files in the same repo. It creates commits that Obsidian doesn't know about, causing merge conflicts on the next pull.
+
 ### Conflict Prevention
 
 - Always let Obsidian pull on open before editing

@@ -27,6 +27,8 @@ jobs:
         with:
           hugo-version: 'latest'
           extended: true
+      - name: Validate posts
+        run: ./scripts/check-posts.sh
       - name: Build
         run: hugo --minify --baseURL "https://robertluwang.github.io/artark-ai/"
       - name: Upload artifact

@@ -1,45 +1,50 @@
 #!/bin/bash
-# publish.sh — Sync posts between Obsidian vault and Hugo repo, build, push
-# Usage: ./publish.sh [commit message]
+# publish.sh — optional convenience wrapper: validate, build, commit, push.
 #
-# Configure these environment variables (e.g. in ~/.bashrc):
-#   OBSIDIAN_VAULT_POSTS - path to Obsidian vault posts folder
-#   HUGO_SITE_DIR        - path to Hugo site root (optional, defaults to script's directory)
+# Entirely optional. Plain git does the same job:
+#   git pull --rebase origin main
+#   git add -A && git commit -m "msg" && git push origin main
+#
+# The value here is fast local feedback: it runs the same checks CI runs, so a
+# broken cover is caught before you push instead of failing the pipeline.
+# The authoritative gate is scripts/check-posts.sh in .github/workflows/hugo.yml,
+# which also covers posts pushed from a phone that never runs this script.
+#
+# Usage: ./publish.sh [commit message]
 
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-HUGO_SITE="${HUGO_SITE_DIR:-$SCRIPT_DIR}"
-HUGO_POSTS="$HUGO_SITE/content/posts"
-VAULT="${OBSIDIAN_VAULT_POSTS:?Set OBSIDIAN_VAULT_POSTS to your Obsidian vault posts folder}"
+set -euo pipefail
 
-cd "$HUGO_SITE"
+cd "$(cd "$(dirname "$0")" && pwd)"
 
-# Pull latest (in case another device pushed new posts)
-git pull --rebase origin main
+HUGO="${HUGO_BIN:-$(command -v hugo || echo ../hugo)}"
 
-# Sync NEW files from repo → vault (posts from other devices)
-rsync -av --ignore-existing "$HUGO_POSTS/" "$VAULT/"
-
-# Sync VAULT → REPO (vault is the source of truth for local edits)
-rsync -av --delete --exclude='.obsidian' "$VAULT/" "$HUGO_POSTS/"
-
-# Show changes
-git status --short
-
-# Build test
-hugo --minify --quiet
-if [ $? -ne 0 ]; then
-    echo "ERROR: Hugo build failed."
+echo "==> Pulling latest from origin"
+if ! git pull --rebase origin main; then
+    echo >&2
+    echo "ERROR: pull/rebase failed — resolve the conflict, then re-run." >&2
+    echo "       git status ; git rebase --continue   (or: git rebase --abort)" >&2
     exit 1
 fi
 
-# Commit and push
-MSG="${1:-update blog posts}"
+echo "==> Validating posts"
+./scripts/check-posts.sh
+
+echo "==> Building"
+if ! "$HUGO" --minify --quiet; then
+    echo "ERROR: Hugo build failed. Nothing was committed." >&2
+    exit 1
+fi
+
 git add -A
 if git diff --cached --quiet; then
     echo "Nothing to publish."
     exit 0
 fi
-git commit -m "$MSG"
+
+echo "==> Changes to publish"
+git diff --cached --stat | cat
+
+git commit -m "${1:-update blog posts}"
 git push origin main
 
 echo "✓ Published. Site live in ~60 seconds."
