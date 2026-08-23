@@ -1,17 +1,17 @@
 +++
 date = '2026-08-23T09:58:00-04:00'
-lastmod = '2026-08-23T12:33:22-04:00'
+lastmod = '2026-08-23T12:45:59-04:00'
 draft = false
-title = 'The Complete Hugo Blogging Pipeline on Windows 11 WSL'
-tags = ['hugo', 'wsl', 'git', 'github-pages', 'obsidian']
+title = 'The Complete Hugo Blogging Pipeline'
+tags = ['hugo', 'git', 'github-pages', 'obsidian']
 
 [params.cover]
   image = "banner.jpg"
-  alt = "The Complete Hugo Blogging Pipeline on Windows 11 WSL"
+  alt = "The Complete Hugo Blogging Pipeline"
   relative = true
 +++
 
-This is the whole pipeline I use to write and publish a Hugo blog from Windows 11 WSL: repo layout, scaffolding, banner handling, a validation gate in CI, and one command to publish. It also covers writing from an iPhone, because the moment a second device exists most of the interesting failures appear.
+This is the whole pipeline I use to write and publish a Hugo blog from Linux (including WSL on Windows 11): repo layout, scaffolding, banner handling, a validation gate in CI, and one command to publish. It also covers writing from an iPhone, because the moment a second device exists most of the interesting failures appear.
 
 It replaces an earlier setup of mine that used an Obsidian vault on Windows and an `rsync` script. That approach is fine for one device — [the original post](/artark-ai/posts/2026-08-15-obsidian-hugo-pipeline/) still stands if that is you — but it silently deleted a section from a published post once I added a phone. That failure shaped everything below.
 
@@ -20,7 +20,7 @@ It replaces an earlier setup of mine that used an Obsidian vault on Windows and 
 Two working copies, both git clones of the same repo:
 
 ```
-iPhone (Obsidian + Obsidian Git)          Laptop (WSL)
+iPhone (Obsidian + Obsidian Git)          Laptop (Linux / WSL)
 ┌────────────────────────────┐            ┌────────────────────────────┐
 │ vault = git clone          │            │ ~/hugo-site = git clone    │
 │   content/posts/           │            │   content/posts/           │
@@ -56,9 +56,9 @@ rsync -av --delete --exclude='.obsidian' "$VAULT/" "$HUGO_POSTS/"
 
 `rsync` compares filenames and timestamps; it cannot tell "newer" from "correct". Git can, because it knows which version descends from which.
 
-The trade-off of dropping the mirror is explicit: **no Obsidian on the laptop**, since Obsidian on Windows cannot open a WSL path — `\\wsl.localhost\...` throws `EISDIR` and junctions demand local volumes. On the laptop you write in an editor that already lives in WSL. If Obsidian on the desktop matters more, invert it: clone into a Windows folder, open that as your vault, and run Obsidian Git there too. Either layout obeys the rule.
+The trade-off of dropping the mirror is explicit: **no Obsidian on the laptop** (unless you clone the repo into a path Obsidian can reach and run Obsidian Git there too). On the laptop you write in whatever editor you already use — vim, VS Code, or Obsidian if the repo lives on a native filesystem it can watch. Either layout obeys the rule: every copy must be a git clone.
 
-## WSL Setup
+## Setup
 
 **Hugo.** Skip the package manager, which drags in a Go toolchain. Take the prebuilt binary from the [releases page](https://github.com/gohugoio/hugo/releases) and keep the single executable in your workspace:
 
@@ -66,14 +66,14 @@ The trade-off of dropping the mirror is explicit: **no Obsidian on the laptop**,
 ./hugo version
 ```
 
-**The repo.** Clone into the Linux filesystem, not `/mnt/c` — Hugo's file watcher and git are both markedly faster there:
+**The repo.** Clone into your home directory. If you are on WSL, that means the Linux filesystem — not `/mnt/c` — since Hugo's file watcher and git are both markedly faster on the native filesystem:
 
 ```bash
 cd ~ && git clone git@github.com:yourname/your-blog.git hugo-site
 cd hugo-site && git submodule update --init --recursive   # theme
 ```
 
-**Line endings.** This matters as soon as two operating systems touch one repo. Without it, a shell script committed from Windows reaches CI with CRLF and dies with a misleading `bad interpreter`. In `.gitattributes`:
+**Line endings.** This matters when multiple operating systems touch the same repo (Windows + Linux, or macOS + Linux). Without it, a shell script committed from Windows reaches CI with CRLF and fails with a misleading `bad interpreter`. In `.gitattributes`:
 
 ```gitattributes
 * text=auto eol=lf
@@ -109,11 +109,11 @@ A Hugo page bundle is a folder holding `index.md` plus its images. Hand-building
 
 It slugifies the title, creates `content/posts/YYYY-MM-DD-slug/`, writes the front matter, and runs the banner through the fitter if you pass one.
 
-By default the URL is derived from the title, which is fine until the title runs long — this post would otherwise have landed at `2026-08-23-the-complete-hugo-blogging-pipeline-on-windows-11-wsl/`. `--slug` decouples the two:
+By default the URL is derived from the title, which is fine until the title runs long — this post would otherwise have landed at `2026-08-23-the-complete-hugo-blogging-pipeline/`. `--slug` decouples the two:
 
 ```bash
 ./scripts/new-post.sh "The Complete Hugo Blogging Pipeline on Windows 11 WSL" \
-  --slug hugo-pipeline-win11-wsl
+  --slug hugo-pipeline
 ```
 
 Short URL, full title on the page and in the social card. It also means retitling later never tempts you into renaming the folder, so links you have already shared keep working. An explicit slug is normalised the same way a derived one is, and you are told when it changes.
@@ -254,11 +254,11 @@ https://yourname.github.io/your-repo/posts/my-post/?v=2
 ## The Full Stack
 
 ```
-new-post.sh (WSL)        — scaffold the page bundle, fit the banner
-$EDITOR (WSL)            — write markdown
-fit-banner.py (WSL)      — normalise banners, archive originals
-hugo server -D (WSL)     — preview, drafts included
-publish.sh (WSL)         — pull, scan, validate, build, push
+new-post.sh              — scaffold the page bundle, fit the banner
+$EDITOR                  — write markdown
+fit-banner.py            — normalise banners, archive originals
+hugo server -D           — preview, drafts included
+publish.sh               — pull, scan, validate, build, push
 git                      — the ONLY sync mechanism, both directions
 GitHub Actions           — validate front matter, then build
 GitHub Pages             — serve the site
