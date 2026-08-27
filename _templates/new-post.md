@@ -5,7 +5,8 @@ const tags = await tp.system.prompt("Tags (comma-separated, or leave empty)");
 const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 const date = tp.date.now("YYYY-MM-DD");
 const datetime = tp.date.now("YYYY-MM-DDTHH:mm:ssZ");
-const folder = `content/posts/${date}-${slug}`;
+const folderName = `${date}-${slug}`;
+const folder = `content/posts/${folderName}`;
 
 // Format tags
 let tagLine = "tags = []";
