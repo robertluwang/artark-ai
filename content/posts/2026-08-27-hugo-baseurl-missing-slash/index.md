@@ -1,13 +1,13 @@
 
 +++
-date = '2026-08-27T00:15:58-04:00'
+date = '2026-08-27T05:57:00-04:00'
 draft = false
 title = 'The Missing Slash: Troubleshooting Hugo Twitter Cards and baseURL Paths'
-tags = ['hugo', 'tweet', 'banner']
+tags = ['hugo', 'tweet card', 'slash', 'banner']
 
 [params.cover]
   image = "banner.jpeg"
-  alt = "Hugo tweet card missing slash"
+  alt = "hugo baseURL missing slash"
   relative = true
 +++
 
@@ -70,6 +70,3 @@ The technical fix was trivial: change the configuration to baseURL = "https://ro
 However, X's caching is notoriously aggressive. Simply pushing the fix wasn't enough, because Twitter had already locked in the broken preview for that specific URL. Rather than messing around with URL query strings to bust the cache, I took the nuclear option. I completely deleted the broken post folder, created a brand new one with a slightly altered title, and copied all the markdown and images over.
 
 By forcing a completely new URL, X was forced to scrape the fresh metadata, and the wobbly banner finally appeared. A frustrating hour of debugging, but a necessary reminder: in static site generation, every slash matters.
-
-
-
