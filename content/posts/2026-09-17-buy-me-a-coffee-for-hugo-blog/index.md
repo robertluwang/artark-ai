@@ -6,7 +6,7 @@ title = 'Monetizing a Static Site: The Complete Guide to Buy Me a Coffee on Hugo
 tags = ['Coffee', 'Hugo']
 
 [params.cover]
-  image = "banner.png"
+  image = "banner.jpg"
   alt = "Buy me a coffee for Hugo blog"
   relative = true
 +++
