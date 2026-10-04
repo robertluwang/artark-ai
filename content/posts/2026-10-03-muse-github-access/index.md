@@ -67,18 +67,11 @@ Trust comes after a test. Muse ran a small check against the API with only the n
 
 The negative test mattered as much as the positive ones. The check also tried a private repo of mine that sits outside the selection, and GitHub answered a flat 404, the same response it gives for a repo that does not exist. To this token, an unselected private repo and a nonexistent one look identical. That sameness is the whole point of scoping it.
 
-## Wiring git without writing the token down
+## Wiring the token in, and where it stops
 
-Git still needed the token at clone and push time, with the raw value kept out of `~/.git-credentials` and out of the repo config. The vault has a small credential helper for this, a short Python script that answers git with the placeholder and lets the exchange happen on the way out.
+The rule was that the raw value stays out of `~/.git-credentials`, out of the repo config, and off this machine's disk in general. The vault mechanism honors it with a placeholder. Scripts on this VM carry the placeholder, and the placeholder gets exchanged for the real token when a request leaves the machine, provided the request carries it in a Bearer header. Every API call in the checks above rides on that exchange. The token is used constantly and handled never.
 
-One wrinkle showed up during setup. Global per-repo credential entries in `~/.gitconfig` lost to the blanket gh helper every time; the account token answered first no matter how specific the entry was. We deleted those entries. Each clone now carries the helper in its own local config:
-
-```bash
-git config credential.helper ""
-git config --add credential.helper ~/workspace/skills/github/bin/git-credential-github-pat.py
-```
-
-The empty first line clears helpers inherited from the global config inside that repo only. Plain, and it survives because it lives with the clone.
+Git speaks a different dialect. Over HTTPS it presents credentials as Basic auth, and the exchange leaves Basic headers alone. So the vault token has no authenticated path into git itself: no credential helper can fix that, because the helper can only hand git the placeholder, and GitHub reads the placeholder as a bad password. The clones live with that limit. They were pulled over plain HTTPS, which public repos allow anonymously, and any authenticated write from this VM goes through the API instead of git. The receipt for that sits near the end of this post, dated the morning after the rest of it.
 
 ## Logging the big token out
 
@@ -91,6 +84,21 @@ gh auth logout --hostname github.com
 The stored hosts file is now an empty `{}`, and `~/.gitconfig` holds nothing but my name and email. A test fetch against a private repo outside the PAT's scope now fails with `could not read Username`, which is the correct sound for this machine to make.
 
 Two clones live at `/home/hatch/pdata/github/`, pulled during the same session: `life` at 30 tracked files and `artark-ai` at 35. Halfway through the work a scheduled vault-backup commit landed in `artark-ai` at 16:10, so the clone is newer than the token check that preceded it. These repos have their own automation running, and now this VM can join it with a key that opens two doors instead of sixty-six.
+
+## The first push failed
+
+Sunday morning I committed this post locally and pushed:
+
+```bash
+git push origin main
+# remote: Invalid username or token. Password authentication is not
+# supported for Git operations.
+# fatal: Authentication failed for 'https://github.com/robertluwang/artark-ai.git/'
+```
+
+During Saturday's setup I had wired a small credential helper into both clones, a short Python script that answers git with the placeholder, and the reads had all come back green: `ls-remote` returned both HEADs, a fetch completed, and the setup went into my notes as verified. The green was hollow. Both repos are public, so those reads never carried a credential in the first place, and the placeholder never met GitHub until the push, the first request that actually needed it. GitHub took one look at a string that means nothing to it and rejected it as a bad password. The token had been valid the whole time, sitting in the vault, waiting on a pipe that was never connected.
+
+The commit went up through the Git Data API instead: upload the markdown and the banner as blobs, build a tree on top of the current one, create the commit, move `main` to it. Four calls, each carrying the placeholder in a Bearer header, each exchanged on the way out. Commit `7e635a7`, the one that carried this post to GitHub, was made exactly that way, and the local clone reset to meet it, with the same tree hash on both sides. The credential helper came out of both clones the same morning. A helper that stays silent until the moment it matters is worse than no helper at all.
 
 One loose end stays on my list. Logout is local; GitHub still shows the CLI authorization under Settings, Applications, and revoking it there kills CLI tokens on every device I own. That click can wait for a moment when I am sitting at my laptop. The token on this VM expires next October, and rotation is a five-minute job: mint a new one, paste it into the vault page, run the check. I can live with that schedule.
 
