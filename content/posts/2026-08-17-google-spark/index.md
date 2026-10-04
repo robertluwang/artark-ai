@@ -121,3 +121,4 @@ The significance of [Gemini Spark](https://blog.google/innovation-and-ai/product
 
 When AI can manage its own execution loop, load specialized skills, and monitor triggers autonomously, it ceases to be just a writing assistant and becomes a reliable, background automation engine.
 
+[![Buy Me A Coffee](https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png)](https://buymeacoffee.com/robertluwang)

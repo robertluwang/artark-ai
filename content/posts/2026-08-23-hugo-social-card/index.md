@@ -113,3 +113,5 @@ Different URL, no cache entry, honest answer. Verify with `curl` first, then tes
 6. Test with a cache-busting query string, not by re-sharing.
 
 The banner on this post is 1200×630 and 36 KB, configured with `relative = true`. If you can see it on the card that brought you here, the config is correct.
+
+[![Buy Me A Coffee](https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png)](https://buymeacoffee.com/robertluwang)

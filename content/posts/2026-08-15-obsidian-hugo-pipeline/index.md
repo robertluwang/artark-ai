@@ -266,3 +266,5 @@ GitHub Pages (cloud)         — serve the site
 ```
 
 No database. No CMS login. No block editor. No WordPress plugins. Just markdown files, a terminal, and a one-line publish command.
+
+[![Buy Me A Coffee](https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png)](https://buymeacoffee.com/robertluwang)

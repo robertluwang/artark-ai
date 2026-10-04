@@ -34,3 +34,5 @@ I find myself drawing a strict line between the two based on predictability. Whe
 When the problem is unstructured, requires cross-referencing outside websites, or demands hours of ad-hoc research that would otherwise eat up a whole afternoon, rigid pipelines break instantly. You cannot build a static flow for a task whose steps you cannot predict in advance. That is where Spark takes over.
 
 Understanding which tool to touch saves you from trying to force an autonomous agent to do reliable plumbing, or trying to wire fifty rigid flow steps together just to handle messy, unpredictable research.
+
+[![Buy Me A Coffee](https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png)](https://buymeacoffee.com/robertluwang)

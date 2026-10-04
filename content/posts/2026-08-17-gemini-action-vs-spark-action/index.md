@@ -62,3 +62,5 @@ Standard Scheduled Actions live inside the chat interface. They are designed for
 Gemini Spark operates as an agentic workspace. It separates the execution trigger from the task instructions. The skill acts as an immutable configuration file that dictates parameters, data schemas, and app actions. If you want to change the number of stories or rewrite the summary layout, you update the skill once. Every schedule tied to that skill picks up the change immediately without needing to reconfigure the timer.
 
 Running both side by side made the distinction straightforward. Standard scheduled tasks are automated chat prompts. Spark tasks are background pipelines.
+
+[![Buy Me A Coffee](https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png)](https://buymeacoffee.com/robertluwang)

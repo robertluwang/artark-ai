@@ -259,3 +259,5 @@ my-blog/
 No database. No CMS. No block editor. Write markdown, push, site is live — with a CI gate that stops broken social cards before they reach the world.
 
 The repo: [github.com/robertluwang/hugo-blog-pipeline](https://github.com/robertluwang/hugo-blog-pipeline)
+
+[![Buy Me A Coffee](https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png)](https://buymeacoffee.com/robertluwang)

@@ -171,3 +171,5 @@ iPhone (Obsidian Git)          Desktop (Obsidian + publish.sh)
 ```
 
 Write anywhere. Push from anywhere. One pipeline builds it all.
+
+[![Buy Me A Coffee](https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png)](https://buymeacoffee.com/robertluwang)

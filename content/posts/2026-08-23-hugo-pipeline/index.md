@@ -273,3 +273,5 @@ Three lessons, in order of how much time each would have saved me.
 **Put safety checks where every device pushes through.** Local hooks protect the machine you were already careful on.
 
 No database. No CMS login. No block editor. And no unmanaged copy of your content waiting to overwrite the good one.
+
+[![Buy Me A Coffee](https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png)](https://buymeacoffee.com/robertluwang)

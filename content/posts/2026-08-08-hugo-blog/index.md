@@ -273,3 +273,5 @@ git push -u origin main
 ```
 
 Enable Pages in your repository settings (on GitHub, set the source to **GitHub Actions**; on GitLab, ensure project visibility is **Public**). From then on, every push automatically triggers a cloud build and updates your live site. Moving away from heavy CMS platforms means your writing process finally becomes just writing.
+
+[![Buy Me A Coffee](https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png)](https://buymeacoffee.com/robertluwang)
