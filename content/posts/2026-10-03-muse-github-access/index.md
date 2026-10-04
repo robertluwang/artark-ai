@@ -1,6 +1,6 @@
 +++
 date = '2026-10-03T16:16:56-04:00'
-draft = true
+draft = false
 title = 'Git Access for Muse, Scoped to Two Repos'
 tags = ['github', 'git', 'muse', 'security']
 
