@@ -21,7 +21,7 @@ Phase 1: Account Setup & Strategy
 
 Before touching your Hugo repository, you need a receiving account.
 
-1. Claim your URL: Go to Buy Me a Coffee and claim a short, recognizable slug (e.g., [buymeacoffee.com/yourname](https://buymeacoffee.com/yourname)).
+1. Claim your URL: Go to Buy Me a Coffee and claim a short, recognizable slug (e.g., [buymeacoffee.com/robertluwang](https://buymeacoffee.com/robertluwang)).
 2. Set the stakes: In Page Settings, set your default "coffee" price to $3 or $5.
 3. Configure payouts: Connect Stripe Express or Wise in the Payouts tab. BMC takes a flat 5% platform fee, plus standard credit card processing fees.
 4. Write the auto-reply: Set up a thank-you message that automatically sends when someone tips. This is a great place to drop a link to an unlisted resource or invite them to ask a technical question.
@@ -37,28 +37,27 @@ PaperMod has built-in SVG support for Buy Me a Coffee. This adds a clean, clicka
 Open your Hugo configuration file (usually hugo.toml or hugo.yaml) and append the BMC profile to your social icons list:
 
 For TOML (hugo.toml):
-
+```
 [[params.socialIcons]]
-
 name = "buymeacoffee"
-
 title = "Buy me a coffee :)"
+url = "https://buymeacoffee.com/robertluwang"
+```
 
-url = "https://buymeacoffee.com/YOUR_USERNAME"
 
 For YAML (config.yml):
-
+```
 - name: "buymeacoffee"
-
   title: "Buy me a coffee :)"
+  url: "https://buymeacoffee.com/robertluwang"
+```
 
-  url: "https://buymeacoffee.com/YOUR_USERNAME"
 
 Method 2: The Inline Markdown Button (Post-Specific)
 
 If you only want to ask for support on massive, high-effort master guides, you can drop a static image link directly into your markdown editor (like Obsidian) at the bottom of the post.
 
-[![Buy Me A Coffee](https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png)](https://buymeacoffee.com/YOUR_USERNAME)
+[![Buy Me A Coffee](https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png)](https://buymeacoffee.com/robertluwang)
 
 Because this is pure markdown, it renders perfectly through Hugo without requiring any theme modifications or custom HTML shortcodes.
 
