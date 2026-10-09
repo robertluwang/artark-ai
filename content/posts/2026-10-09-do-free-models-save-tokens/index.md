@@ -1,6 +1,6 @@
 +++
 date = '2026-10-09T12:52:35-04:00'
-draft = true
+draft = false
 title = 'Counting the Tokens: What a Free-Model Setup Actually Saved Me'
 tags = ['pi', 'openrouter', 'llm', 'muse', 'tokens']
 
