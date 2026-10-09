@@ -1,6 +1,6 @@
 +++
 date = '2026-10-09T11:20:29-04:00'
-draft = true
+draft = false
 title = 'Pi and OpenRouter Free Models, Wired Into Muse'
 tags = ['pi', 'openrouter', 'llm', 'muse', 'agents']
 
